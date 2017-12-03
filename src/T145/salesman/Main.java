@@ -3,6 +3,8 @@ package T145.salesman;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
@@ -11,8 +13,6 @@ public class Main {
 
 		private final double x;
 		private final double y;
-
-		private boolean colliding;
 
 		public Point(double x, double y) {
 			this.x = x;
@@ -29,14 +29,6 @@ public class Main {
 
 		public double getDistance(Point dest) {
 			return Math.sqrt(Math.pow(dest.getX() - x, 2) + Math.pow(dest.getY() - y, 2));
-		}
-
-		public void setColliding() {
-			colliding = true;
-		}
-
-		public boolean isColliding() {
-			return colliding;
 		}
 
 		@Override
@@ -86,11 +78,9 @@ public class Main {
 	 */
 
 	public static void main(String[] args) {
+		System.out.println("Hello World!"); // superstition lives free
 
-		// superstition lives free
-		System.out.println("Hello World!");
-
-		double[][] rawGraph = Reference.SQUARE;
+		double[][] rawGraph = Reference.TRICKY_TRAPEZOID;
 		List<Point> points = new ArrayList<>();
 
 		System.out.println('\n' + "Input Graph:");
@@ -137,7 +127,6 @@ public class Main {
 				Point other = points.get(s);
 
 				if (point.getY() == other.getY()) {
-					other.setColliding();
 					collisions.add(new Collision(point, other));
 
 					// remove, b/c collisions can fit later in the list, and we want to find where they can go
@@ -176,61 +165,33 @@ public class Main {
 				}
 			}
 
-			// any leftover points must be added to the top
-			// the sources are already in the list
+			Deque<Integer> indices = new LinkedList<>();
+
+			// if we have any leftover points, find the best place to put it
+			// the collisions should still be in a sorted order, so just start from the bottom and work our way up
+			// fixes multiple collision cases
 			while (!collisions.isEmpty()) {
 				Collision collision = collisions.remove(0);
 				System.out.println("Leftovers: " + collision);
-				solution.add(collision.getHit());
-			}
+				Point target = collision.getHit();
 
-			for (int t = 1, uBound = solution.size() - 1; t < uBound; ++t) {
-				Point point = solution.get(t);
+				indices.clear();
 
-				if (point.isColliding()) {
-					System.out.println("Collision: " + t);
-				}
-			}
+				for (int t = 0; t < solution.size(); ++t) {
+					Point candidate = solution.get(t);
+					double dist = candidate.getDistance(target);
 
-			// verify the solution
-			// this is basically just for the square case or other level polygon cases; all other cases should be unaffected
-			/*for (int t = 1, uBound = solution.size() - 1; t < uBound; ++t) {
-				Point point = solution.get(t);
-
-				if (point.isColliding()) {
-					// get the previous point (a collision cannot be the first point)
-					int sourceIndex = t - 1;
-					Point source = solution.get(sourceIndex);
-					double sourceDist = source.getDistance(point);
-
-					// get the next point
-					int neighborIndex = t + 1;
-					Point neighbor = solution.get(neighborIndex);
-					double neighborDist = point.getDistance(neighbor);
-
-					// get the neighbor distance for the next point
-					int nextNeighborIndex = t == uBound - 2 ? 0 : t + 2;
-					Point nextNeighbor = solution.get(nextNeighborIndex);
-					double nextNeighborDist = neighbor.getDistance(nextNeighbor);
-
-					// NOTE: B/c we're checking a collision, the y values of it and the point to swap should be the same
-					// so, if the x value of the neighbor and swapee are in the right order, then don't swap
-					// the same could be said for y values of other graphs, so we don't mess up other cases
-					// if x != other.x && y != other.y then swap
-
-					if (sourceDist == nextNeighborDist && neighborDist > sourceDist) {
-						int otherNeighborIndex = neighborIndex + 1;
-						Point otherNeighbor = solution.get(otherNeighborIndex);
-
-						if (neighbor.getX() != otherNeighbor.getX() && neighbor.getY() != otherNeighbor.getY()) {
-							Collections.swap(solution, neighborIndex, otherNeighborIndex);
-
-							// be sure we don't undo intentionally undo our changes by skipping the element we just swapped
-							++t;
-						}
+					if (indices.isEmpty()) {
+						indices.add(t);
+					} else if (solution.get(indices.getFirst()).getDistance(target) <= dist) {
+						indices.addFirst(t);
+					} else {
+						indices.addLast(t);
 					}
 				}
-			}*/
+
+				solution.add(indices.getFirst(), target);
+			}
 		} else {
 			solution = new ArrayList<>(points);
 		}
@@ -238,8 +199,6 @@ public class Main {
 		for (Point point : solution) {
 			System.out.println(point);
 		}
-
-		// we have the shortest path right now, so we can just iterate over it
 
 		System.out.println('\n' + " --- VERIFICATION ---");
 		System.out.println("Graph Length:\t" + rawGraph.length);
