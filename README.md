@@ -50,7 +50,6 @@ The fact that people have thought along these lines in the past gave me reassura
 Currently my implementation works for the following cases:
 - a single point (length 0)
 - simple to complex polygons
-* Below require a set range, implied already by the input of a set amount of points
 - lines (simple to complex functions implied)
 - scatter plots (implied from polygons)
 
