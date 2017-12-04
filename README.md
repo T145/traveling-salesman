@@ -49,16 +49,16 @@ The fact that people have thought along these lines in the past gave me reassura
 
 Currently my implementation works for the following cases:
 - a single point (length 0)
-- polygons
+- simple to complex polygons
 * Below require a set range, implied already by the input of a set amount of points
 - lines (simple to complex functions implied)
 - scatter plots (implied from polygons)
 
 Every possible path would have to be either one or a mixture of these.
 
+### Asymptotic Analysis
 *NOTE: c1 includes collisions, and c0 doesn't*
 
-### Asymptotic Analysis
 | Phase | c0 | c1 |
 --- | :---: | :---:
 Pre | O(n^2) | O(n^2)
