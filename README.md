@@ -42,18 +42,25 @@ After the shortest path is computed, if we have any leftover collisions add them
 The logic behind this is that we're supposed to already have the shortest path, so any points that cannot fit as the shortest option can just link the circuit, and still give us the shortest path.
 
 After some research, my solution most closely resembles the _Nearest Neighbor Algorithm_ by Rosenkratz, Stearns and Lewis, detailed on page 242 of [this paper](https://www.sciencedirect.com/science/article/pii/037722179290138Y).
-The beauty in my solution is that in its best case we can get O(n) performance, and in its worst we get O(n^2).
-So I can optimize their theoretical solution by one full loop.
-Best case is a graph with no collisions, but if it contains any we need to loop over them to find the best spot for them.
-There may also be post-processing cost(s).
 The fact that people have thought along these lines in the past gave me reassurance that I was on an accurate path.
 
 ## Results
 
-Currently my implementation works for random scatter plots and lines.
-It has been tested across a large suite of random graphs from 5-100 points, and generates the correct solution.
-As of now it has difficulty in calculating simple to complex polygons, like a square, because it calculates the path including diagonals, rather than just the sides.
-This is after a significant code update, though. A fix is in the works. I also plan to develop a small graphics application to show how the algorithm solves the graph. Random to hard-coded graphs can be used.
-My previous versions of the algorithm will also be provided, though the earlier versions are not up to "professional" coding standards, as I was just wanted to get everything working at that point.
+Currently my implementation works for the following cases:
+- a single point (length 0)
+- polygons
+* Below require a set range, implied already by the input of a set amount of points
+- lines (simple to complex functions implied)
+- scatter plots (implied from polygons)
+Every possible path would have to be either one or a mixture of these.
+
+*NOTE: c1 includes collisions, and c0 doesn't*
+
+### Asymptotic Analysis
+| Phase | c0 | c1 |
+--- | :---: | :---:
+Pre | O(n^2) | O(n^2)
+Init | O(1) | O(n^3)
+Post | O(n) | O(n)
 
 ### [Copyright](https://www.infoworld.com/article/2615869/open-source-software/github-needs-to-take-open-source-seriously.html)

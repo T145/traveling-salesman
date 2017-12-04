@@ -3,9 +3,9 @@ package T145.salesman;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -147,7 +147,7 @@ public class Main {
 				for (int s = 0; s < collisions.size(); ++s) {
 					Collision collision = collisions.get(s);
 
-					// decide if the collision is the closest point to add and dequeue it, else leave it in the cache
+					// add the collision if it is the closer neighbor, else leave it in the cache
 					if (collision.getSource().equals(point)) {
 						Point next = collision.getHit();
 						Point neighbor = points.get(t == points.size() - 1 ? 0 : t + 1);
@@ -157,40 +157,29 @@ public class Main {
 						if (collisionDist <= neighborDist) {
 							solution.add(next);
 							collisions.remove(s);
-						} else {
-							// the collision is left in the cache
-							// if there's anything smart we need to do w/ it do it here
 						}
 					}
 				}
 			}
 
-			Deque<Integer> indices = new LinkedList<>();
+			// any leftover collisions fall into the scalene triangle case
+			// we need to calculate the total distance of the graph w/ the collision at every point,
+			// decide which is the shortest distance, and which index the collision can be inserted at to get said distance
+			Map<Double, Integer> distances = new HashMap<>();
+			List<Point> virtualSolution = new ArrayList<>(solution);
 
-			// if we have any leftover points, find the best place to put it
-			// the collisions should still be in a sorted order, so just start from the bottom and work our way up
-			// fixes multiple collision cases
 			while (!collisions.isEmpty()) {
 				Collision collision = collisions.remove(0);
-				System.out.println("Leftovers: " + collision);
-				Point target = collision.getHit();
-
-				indices.clear();
+				Point hit = collision.getHit();
 
 				for (int t = 0; t < solution.size(); ++t) {
-					Point candidate = solution.get(t);
-					double dist = candidate.getDistance(target);
-
-					if (indices.isEmpty()) {
-						indices.add(t);
-					} else if (solution.get(indices.getFirst()).getDistance(target) <= dist) {
-						indices.addFirst(t);
-					} else {
-						indices.addLast(t);
-					}
+					virtualSolution.add(t, hit);
+					distances.put(getTotalDistance(virtualSolution), t);
+					virtualSolution = new ArrayList<>(solution);
 				}
 
-				solution.add(indices.getFirst(), target);
+				solution.add(distances.get(Collections.min(distances.keySet())), hit);
+				distances.clear();
 			}
 		} else {
 			solution = new ArrayList<>(points);
@@ -205,13 +194,16 @@ public class Main {
 		System.out.println("Solution Size:\t" + solution.size());
 		System.out.println("VERIFIED: " + (solution.size() == rawGraph.length));
 		System.out.println('\n' + " --- FINAL PHASE ---");
+		System.out.println("SOLUTION: " + getTotalDistance(solution));
+	}
 
+	private static double getTotalDistance(List<Point> solution) {
 		double shortestDist = 0;
 
 		for (int t = 0; t < solution.size(); ++t) {
 			shortestDist += solution.get(t).getDistance(solution.get(t == solution.size() - 1 ? 0 : t + 1));
 		}
 
-		System.out.println("SOLUTION: " + shortestDist);
+		return shortestDist;
 	}
 }
