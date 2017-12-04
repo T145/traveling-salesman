@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Main {
 
@@ -71,16 +72,10 @@ public class Main {
 		}
 	}
 
-	/*
-	 * NOTES:
-	 * - a point CANNOT have more than two connections, otherwise we'd be visiting it more than once
-	 * - if collisionDist <= neighborDist add the collision after the point else cache for later calculation
-	 */
-
 	public static void main(String[] args) {
 		System.out.println("Hello World!"); // superstition lives free
 
-		double[][] rawGraph = Reference.TRICKY_TRAPEZOID;
+		double[][] rawGraph = Reference.FLAT_LINE;
 		List<Point> points = new ArrayList<>();
 
 		System.out.println('\n' + "Input Graph:");
@@ -119,7 +114,6 @@ public class Main {
 
 		List<Collision> collisions = new ArrayList<>();
 
-		// TODO: Optimize to skip indexes that were registered as collisions
 		for (int t = 0; t < points.size(); ++t) {
 			Point point = points.get(t);
 
@@ -128,8 +122,6 @@ public class Main {
 
 				if (point.getY() == other.getY()) {
 					collisions.add(new Collision(point, other));
-
-					// remove, b/c collisions can fit later in the list, and we want to find where they can go
 					points.remove(s);
 				}
 			}
@@ -137,7 +129,9 @@ public class Main {
 
 		List<Point> solution;
 
-		if (!collisions.isEmpty()) {
+		if (collisions.isEmpty()) {
+			solution = new ArrayList<>(points);
+		} else {
 			solution = new ArrayList<>();
 
 			for (int t = 0; t < points.size(); ++t) {
@@ -171,18 +165,23 @@ public class Main {
 			while (!collisions.isEmpty()) {
 				Collision collision = collisions.remove(0);
 				Point hit = collision.getHit();
+				System.out.println("Processing leftovers: " + hit);
 
+				// BUG TODO: Flat line misplaces the last collision
+				// BUG TODO: Perfect squares still don't work
 				for (int t = 0; t < solution.size(); ++t) {
 					virtualSolution.add(t, hit);
 					distances.put(getTotalDistance(virtualSolution), t);
 					virtualSolution = new ArrayList<>(solution);
 				}
 
+				for (Entry<Double, Integer> dist : distances.entrySet()) {
+					System.out.println("Distance: " + dist.getKey() + "; Index: " + dist.getValue());
+				}
+
 				solution.add(distances.get(Collections.min(distances.keySet())), hit);
 				distances.clear();
 			}
-		} else {
-			solution = new ArrayList<>(points);
 		}
 
 		for (Point point : solution) {
