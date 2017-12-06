@@ -55,13 +55,22 @@ Currently my implementation works for the following cases:
 
 Every possible path would have to be either one or a mixture of these.
 
-### Asymptotic Analysis
-*NOTE: c1 includes collisions, and c0 doesn't*
+## Asymptotic Analysis
 
-| Phase | c0 | c1 |
---- | :---: | :---:
-Pre | O(n^2) | O(n^2)
-Init | O(1) | O(n^3)
-Post | O(n) | O(n)
+_*Against Graph Without Collisions*_
+
+| Phase | Performance
+--- | :---:
+Pre | theta(n^2)
+Init | theta(1)
+Post | theta(n)
+
+_*Against Graph With Collisions*_
+
+| Phase | Performance
+--- | :---:
+Pre | theta(n^2)
+Init | O(n^3)
+Post | theta(n)
 
 ### [Copyright](https://www.infoworld.com/article/2615869/open-source-software/github-needs-to-take-open-source-seriously.html)
