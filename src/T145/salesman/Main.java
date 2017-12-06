@@ -15,6 +15,8 @@ public class Main {
 		private final double x;
 		private final double y;
 
+		private boolean colliding;
+
 		public Point(double x, double y) {
 			this.x = x;
 			this.y = y;
@@ -30,6 +32,14 @@ public class Main {
 
 		public double getDistance(Point dest) {
 			return Math.sqrt(Math.pow(dest.getX() - x, 2) + Math.pow(dest.getY() - y, 2));
+		}
+
+		public void setColliding() {
+			colliding = true;
+		}
+
+		public boolean isColliding() {
+			return colliding;
 		}
 
 		@Override
@@ -75,7 +85,7 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println("Hello World!"); // superstition lives free
 
-		double[][] rawGraph = Reference.FLAT_LINE;
+		double[][] rawGraph = Reference.SQUARE;
 		List<Point> points = new ArrayList<>();
 
 		System.out.println('\n' + "Input Graph:");
@@ -121,6 +131,7 @@ public class Main {
 				Point other = points.get(s);
 
 				if (point.getY() == other.getY()) {
+					other.setColliding();
 					collisions.add(new Collision(point, other));
 					points.remove(s);
 				}
@@ -160,27 +171,56 @@ public class Main {
 			// we need to calculate the total distance of the graph w/ the collision at every point,
 			// decide which is the shortest distance, and which index the collision can be inserted at to get said distance
 			Map<Double, Integer> distances = new HashMap<>();
-			List<Point> virtualSolution = new ArrayList<>(solution);
+			List<Point> virtualSolution /*= new ArrayList<>(solution)*/;
 
-			while (!collisions.isEmpty()) {
-				Collision collision = collisions.remove(0);
-				Point hit = collision.getHit();
-				System.out.println("Processing leftovers: " + hit);
+			// final verification; check if collisions are in the right spot
+			if (collisions.isEmpty()) {
+				for (int t = 1; t < solution.size(); ++t) { // a collision cannot be the first point, so skip it
+					Point p = solution.get(t);
 
-				// BUG TODO: Flat line misplaces the last collision
-				// BUG TODO: Perfect squares still don't work
-				for (int t = 0; t < solution.size(); ++t) {
-					virtualSolution.add(t, hit);
-					distances.put(getTotalDistance(virtualSolution), t);
-					virtualSolution = new ArrayList<>(solution);
+					if (p.isColliding()) {
+						virtualSolution = new ArrayList<>(solution);
+						Collections.swap(virtualSolution, t, t - 1);
+
+						System.out.println();
+						for (Point point : virtualSolution) {
+							System.out.println(point);
+						}
+
+						double virtualDist = getTotalDistance(virtualSolution);
+						double currentDist = getTotalDistance(solution);
+
+						System.out.println("Colliding Index: " + t);
+						System.out.println("Potential Distance: " + virtualDist);
+						System.out.println("Colliding Distance: " + currentDist);
+
+						if (virtualDist < currentDist) {
+							solution = new ArrayList<>(virtualSolution);
+						}
+					}
 				}
 
-				for (Entry<Double, Integer> dist : distances.entrySet()) {
-					System.out.println("Distance: " + dist.getKey() + "; Index: " + dist.getValue());
-				}
+				System.out.println();
+			} else {
+				while (!collisions.isEmpty()) {
+					Collision collision = collisions.remove(0);
+					Point hit = collision.getHit();
+					System.out.println("Processing leftovers: " + hit);
 
-				solution.add(distances.get(Collections.min(distances.keySet())), hit);
-				distances.clear();
+					// BUG TODO: Flat line misplaces the last collision
+					for (int t = 0; t < solution.size(); ++t) {
+						virtualSolution = new ArrayList<>(solution);
+						virtualSolution.add(t, hit);
+						distances.put(getTotalDistance(virtualSolution), t);
+					}
+
+					for (Entry<Double, Integer> dist : distances.entrySet()) {
+						System.out.println("Distance: " + dist.getKey() + "; Index: " + dist.getValue());
+					}
+
+					solution.add(distances.get(Collections.min(distances.keySet())), hit);
+					distances.clear();
+				}
 			}
 		}
 
