@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class Main {
 
@@ -82,25 +81,50 @@ public class Main {
 		}
 	}
 
-	public static void main(String[] args) {
-		System.out.println("Hello World!"); // superstition lives free
+	private static double getTotalDistance(List<Point> solution) {
+		double shortestDist = 0;
 
-		double[][] rawGraph = Reference.SQUARE;
-		List<Point> points = new ArrayList<>();
+		for (int t = 0; t < solution.size(); ++t) {
+			shortestDist += solution.get(t).getDistance(solution.get(t == solution.size() - 1 ? 0 : t + 1));
+		}
 
-		System.out.println('\n' + "Input Graph:");
-		for (int t = 0; t < rawGraph.length; ++t) {
-			Point point = new Point(rawGraph[t][0], rawGraph[t][1]);
-			points.add(point);
+		return shortestDist;
+	}
+
+	private static void printResults(double[][] graph, List<Point> solution) {
+		System.out.println('\n' + " --- RESULT ---");
+
+		for (Point point : solution) {
 			System.out.println(point);
 		}
 
-		// single point case
-		if (rawGraph.length == 1) {
+		System.out.println('\n' + " --- VERIFICATION ---");
+		System.out.println("Graph Length:\t" + graph.length);
+		System.out.println("Solution Size:\t" + solution.size());
+		System.out.println("VERIFIED: " + (solution.size() == graph.length));
+		System.out.println('\n' + " --- FINAL PHASE ---");
+		System.out.println("SOLUTION: " + getTotalDistance(solution));
+	}
+
+	public static void main(String[] args) {
+		double[][] graph = Reference.SIMPLE_GRAPH;
+
+		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
 			return;
 		}
 
+		List<Point> points = new ArrayList<>();
+
+		// O(n)
+		System.out.println("Input Graph: ");
+		for (int t = 0; t < graph.length; ++t) {
+			Point point = new Point(graph[t][0], graph[t][1]);
+			points.add(point);
+			System.out.println(point);
+		}
+
+		// O(nlog(n))
 		Collections.sort(points, new Comparator<Point>() {
 
 			@Override
@@ -115,15 +139,9 @@ public class Main {
 			}
 		});
 
-		System.out.println('\n' + "Sorted Graph:");
-		for (Point point : points) {
-			System.out.println(point);
-		}
-
-		System.out.println('\n' + " --- SHORTEST PATH ---");
-
 		List<Collision> collisions = new ArrayList<>();
 
+		// O(n^2)
 		for (int t = 0; t < points.size(); ++t) {
 			Point point = points.get(t);
 
@@ -138,13 +156,12 @@ public class Main {
 			}
 		}
 
-		List<Point> solution;
-
 		if (collisions.isEmpty()) {
-			solution = new ArrayList<>(points);
+			printResults(graph, points);
 		} else {
-			solution = new ArrayList<>();
+			List<Point> solution = new ArrayList<>();
 
+			// O(n^2)
 			for (int t = 0; t < points.size(); ++t) {
 				Point point = points.get(t);
 				solution.add(point);
@@ -167,14 +184,12 @@ public class Main {
 				}
 			}
 
-			// any leftover collisions fall into the scalene triangle case
-			// we need to calculate the total distance of the graph w/ the collision at every point,
-			// decide which is the shortest distance, and which index the collision can be inserted at to get said distance
-			Map<Double, Integer> distances = new HashMap<>();
-			List<Point> virtualSolution /*= new ArrayList<>(solution)*/;
+			List<Point> virtualSolution;
 
 			// final verification; check if collisions are in the right spot
 			if (collisions.isEmpty()) {
+
+				// O(n^2)
 				for (int t = 1; t < solution.size(); ++t) { // a collision cannot be the first point, so skip it
 					Point p = solution.get(t);
 
@@ -182,67 +197,34 @@ public class Main {
 						virtualSolution = new ArrayList<>(solution);
 						Collections.swap(virtualSolution, t, t - 1);
 
-						System.out.println();
-						for (Point point : virtualSolution) {
-							System.out.println(point);
-						}
-
 						double virtualDist = getTotalDistance(virtualSolution);
 						double currentDist = getTotalDistance(solution);
-
-						System.out.println("Colliding Index: " + t);
-						System.out.println("Potential Distance: " + virtualDist);
-						System.out.println("Colliding Distance: " + currentDist);
 
 						if (virtualDist < currentDist) {
 							solution = new ArrayList<>(virtualSolution);
 						}
 					}
 				}
-
-				System.out.println();
 			} else {
+				Map<Double, Integer> distances = new HashMap<>();
+
+				// O(n^3)
 				while (!collisions.isEmpty()) {
-					Collision collision = collisions.remove(0);
-					Point hit = collision.getHit();
-					System.out.println("Processing leftovers: " + hit);
+					Point c = collisions.remove(0).getHit();
 
 					// BUG TODO: Flat line misplaces the last collision
 					for (int t = 0; t < solution.size(); ++t) {
 						virtualSolution = new ArrayList<>(solution);
-						virtualSolution.add(t, hit);
+						virtualSolution.add(t, c);
 						distances.put(getTotalDistance(virtualSolution), t);
 					}
 
-					for (Entry<Double, Integer> dist : distances.entrySet()) {
-						System.out.println("Distance: " + dist.getKey() + "; Index: " + dist.getValue());
-					}
-
-					solution.add(distances.get(Collections.min(distances.keySet())), hit);
+					solution.add(distances.get(Collections.min(distances.keySet())), c);
 					distances.clear();
 				}
 			}
+
+			printResults(graph, solution);
 		}
-
-		for (Point point : solution) {
-			System.out.println(point);
-		}
-
-		System.out.println('\n' + " --- VERIFICATION ---");
-		System.out.println("Graph Length:\t" + rawGraph.length);
-		System.out.println("Solution Size:\t" + solution.size());
-		System.out.println("VERIFIED: " + (solution.size() == rawGraph.length));
-		System.out.println('\n' + " --- FINAL PHASE ---");
-		System.out.println("SOLUTION: " + getTotalDistance(solution));
-	}
-
-	private static double getTotalDistance(List<Point> solution) {
-		double shortestDist = 0;
-
-		for (int t = 0; t < solution.size(); ++t) {
-			shortestDist += solution.get(t).getDistance(solution.get(t == solution.size() - 1 ? 0 : t + 1));
-		}
-
-		return shortestDist;
 	}
 }
