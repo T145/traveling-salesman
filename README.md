@@ -61,7 +61,7 @@ _*Against Graph Without Collisions*_
 
 | Phase | Performance
 --- | :---:
-Pre | theta(n^2)
+Pre | O(n^2)
 Init | theta(1)
 Post | theta(n)
 
@@ -69,7 +69,7 @@ _*Against Graph With Collisions*_
 
 | Phase | Performance
 --- | :---:
-Pre | theta(n^2)
+Pre | O(n^2)
 Init | O(n^3)
 Post | theta(n)
 
