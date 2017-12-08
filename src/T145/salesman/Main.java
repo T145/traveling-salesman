@@ -117,7 +117,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.SIMPLE_GRAPH;
+		double[][] graph = Reference.SQUARE_WITH_CENTER;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
