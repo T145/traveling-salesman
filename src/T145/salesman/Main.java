@@ -2,14 +2,13 @@ package T145.salesman;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
 
-	private static class Point {
+	private static class Point implements Comparable<Point> {
 
 		private final double x;
 		private final double y;
@@ -54,6 +53,17 @@ public class Main {
 			}
 
 			return false;
+		}
+
+		@Override
+		public int compareTo(Point other) {
+			int result = Double.compare(x, other.getX());
+
+			if (result == 0) {
+				result = Double.compare(y, other.getY());
+			}
+
+			return result;
 		}
 	}
 
@@ -125,19 +135,7 @@ public class Main {
 		}
 
 		// O(nlog(n))
-		Collections.sort(points, new Comparator<Point>() {
-
-			@Override
-			public int compare(Point a, Point b) {
-				int result = Double.compare(a.getX(), b.getX());
-
-				if (result == 0) {
-					result = Double.compare(a.getY(), b.getY());
-				}
-
-				return result;
-			}
-		});
+		Collections.sort(points);
 
 		List<Collision> collisions = new ArrayList<>();
 
@@ -173,10 +171,8 @@ public class Main {
 					if (collision.getSource().equals(point)) {
 						Point next = collision.getHit();
 						Point neighbor = points.get(t == points.size() - 1 ? 0 : t + 1);
-						double collisionDist = point.getDistance(next);
-						double neighborDist = point.getDistance(neighbor);
 
-						if (collisionDist <= neighborDist) {
+						if (point.getDistance(next) <= point.getDistance(neighbor)) {
 							solution.add(next);
 							collisions.remove(s);
 						}
@@ -197,10 +193,7 @@ public class Main {
 						virtualSolution = new ArrayList<>(solution);
 						Collections.swap(virtualSolution, t, t - 1);
 
-						double virtualDist = getTotalDistance(virtualSolution);
-						double currentDist = getTotalDistance(solution);
-
-						if (virtualDist < currentDist) {
+						if (getTotalDistance(virtualSolution) < getTotalDistance(solution)) {
 							solution = new ArrayList<>(virtualSolution);
 						}
 					}
