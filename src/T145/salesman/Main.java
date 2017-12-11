@@ -161,7 +161,6 @@ public class Main {
 				while (!collisions.isEmpty()) {
 					Point c = collisions.remove(0);
 
-					// BUG TODO: Flat line misplaces the last collision
 					for (int t = 0; t < points.size(); ++t) {
 						virtualSolution = new ArrayList<>(points);
 						virtualSolution.add(t, c);
