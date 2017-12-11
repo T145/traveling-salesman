@@ -3,8 +3,10 @@ package T145.salesman;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public class Main {
 
@@ -12,8 +14,6 @@ public class Main {
 
 		private final double x;
 		private final double y;
-
-		private boolean colliding;
 
 		public Point(double x, double y) {
 			this.x = x;
@@ -34,14 +34,6 @@ public class Main {
 			distX *= distX;
 			distY *= distY;
 			return Math.sqrt(distX + distY);
-		}
-
-		public void setColliding() {
-			colliding = true;
-		}
-
-		public boolean isColliding() {
-			return colliding;
 		}
 
 		@Override
@@ -97,7 +89,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.SQUARE_WITH_CENTER;
+		double[][] graph = Reference.SIMPLE_GRAPH;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -105,7 +97,7 @@ public class Main {
 		}
 
 		List<Point> points = new ArrayList<>();
-		List<Point> collisions = new ArrayList<>();
+		Queue<Point> collisions = new LinkedList<>();
 
 		// O(n)
 		System.out.println("Input Graph: ");
@@ -126,7 +118,6 @@ public class Main {
 				Point other = points.get(s);
 
 				if (point.getY() == other.getY()) {
-					other.setColliding();
 					collisions.add(other);
 					points.remove(s);
 				}
@@ -137,42 +128,23 @@ public class Main {
 			printResults(graph, points);
 		} else {
 			List<Point> virtualSolution;
+			Map<Double, Integer> distances = new HashMap<>();
 
-			// final verification; check if collisions are in the right spot
-			if (collisions.isEmpty()) {
+			// O(n^3)
+			while (!collisions.isEmpty()) {
+				Point c = collisions.remove();
 
-				// O(n^2)
-				for (int t = 1; t < points.size(); ++t) { // a collision cannot be the first point, so skip it
-					Point p = points.get(t);
-
-					if (p.isColliding()) {
-						virtualSolution = new ArrayList<>(points);
-						Collections.swap(virtualSolution, t, t - 1);
-
-						if (getTotalDistance(virtualSolution) < getTotalDistance(points)) {
-							points = new ArrayList<>(virtualSolution);
-						}
-					}
+				for (int t = 0; t < points.size(); ++t) {
+					virtualSolution = new ArrayList<>(points);
+					virtualSolution.add(t, c);
+					distances.put(getTotalDistance(virtualSolution), t);
 				}
-			} else {
-				Map<Double, Integer> distances = new HashMap<>();
 
-				// O(n^3)
-				while (!collisions.isEmpty()) {
-					Point c = collisions.remove(0);
-
-					for (int t = 0; t < points.size(); ++t) {
-						virtualSolution = new ArrayList<>(points);
-						virtualSolution.add(t, c);
-						distances.put(getTotalDistance(virtualSolution), t);
-					}
-
-					points.add(distances.get(Collections.min(distances.keySet())), c);
-					distances.clear();
-				}
+				points.add(distances.get(Collections.min(distances.keySet())), c);
+				distances.clear();
 			}
-
-			printResults(graph, points);
 		}
+
+		printResults(graph, points);
 	}
 }
