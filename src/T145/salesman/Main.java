@@ -71,30 +71,6 @@ public class Main {
 		}
 	}
 
-	private static class Collision {
-
-		private final Point source;
-		private final Point hit;
-
-		public Collision(Point source, Point hit) {
-			this.source = source;
-			this.hit = hit;
-		}
-
-		public Point getSource() {
-			return source;
-		}
-
-		public Point getHit() {
-			return hit;
-		}
-
-		@Override
-		public String toString() {
-			return "Source: " + source + "; Hit: " + hit;
-		}
-	}
-
 	private static double getTotalDistance(List<Point> solution) {
 		double shortestDist = 0;
 
@@ -121,7 +97,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.SQUARE_WITH_CENTER;
+		double[][] graph = Reference.TRICKY_TRAPEZOID;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -129,6 +105,7 @@ public class Main {
 		}
 
 		List<Point> points = new ArrayList<>();
+		List<Point> collisions = new ArrayList<>();
 
 		// O(n)
 		System.out.println("Input Graph: ");
@@ -141,8 +118,6 @@ public class Main {
 		// O(nlog(n))
 		Collections.sort(points);
 
-		List<Collision> collisions = new ArrayList<>();
-
 		// O(n^2)
 		for (int t = 0; t < points.size(); ++t) {
 			Point point = points.get(t);
@@ -152,7 +127,7 @@ public class Main {
 
 				if (point.getY() == other.getY()) {
 					other.setColliding();
-					collisions.add(new Collision(point, other));
+					collisions.add(other);
 					points.remove(s);
 				}
 			}
@@ -168,16 +143,15 @@ public class Main {
 				Point point = points.get(t);
 				solution.add(point);
 
-				for (int s = 0; s < collisions.size(); ++s) {
-					Collision collision = collisions.get(s);
+				for (int s = 0; s < t; ++s) { // first point will be ignored automatically
+					Point collision = collisions.get(s);
 
 					// add the collision if it is the closer neighbor, else leave it in the cache
-					if (collision.getSource().equals(point)) {
-						Point next = collision.getHit();
+					if (collision.getY() == point.getY()) {
 						Point neighbor = points.get(t == points.size() - 1 ? 0 : t + 1);
 
-						if (point.getDistance(next) <= point.getDistance(neighbor)) {
-							solution.add(next);
+						if (point.getDistance(collision) <= point.getDistance(neighbor)) {
+							solution.add(collision);
 							collisions.remove(s);
 						}
 					}
@@ -207,7 +181,7 @@ public class Main {
 
 				// O(n^3)
 				while (!collisions.isEmpty()) {
-					Point c = collisions.remove(0).getHit();
+					Point c = collisions.remove(0);
 
 					// BUG TODO: Flat line misplaces the last collision
 					for (int t = 0; t < solution.size(); ++t) {
