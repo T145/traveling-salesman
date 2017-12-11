@@ -71,33 +71,33 @@ public class Main {
 		}
 	}
 
-	private static double getTotalDistance(List<Point> solution) {
+	private static double getTotalDistance(List<Point> points) {
 		double shortestDist = 0;
 
-		for (int t = 0; t < solution.size(); ++t) {
-			shortestDist += solution.get(t).getDistance(solution.get(t == solution.size() - 1 ? 0 : t + 1));
+		for (int t = 0; t < points.size(); ++t) {
+			shortestDist += points.get(t).getDistance(points.get(t == points.size() - 1 ? 0 : t + 1));
 		}
 
 		return shortestDist;
 	}
 
-	private static void printResults(double[][] graph, List<Point> solution) {
+	private static void printResults(double[][] graph, List<Point> points) {
 		System.out.println('\n' + " --- RESULT ---");
 
-		for (Point point : solution) {
+		for (Point point : points) {
 			System.out.println(point);
 		}
 
 		System.out.println('\n' + " --- VERIFICATION ---");
 		System.out.println("Graph Length:\t" + graph.length);
-		System.out.println("Solution Size:\t" + solution.size());
-		System.out.println("VERIFIED: " + (solution.size() == graph.length));
+		System.out.println("Solution Size:\t" + points.size());
+		System.out.println("VERIFIED: " + (points.size() == graph.length));
 		System.out.println('\n' + " --- FINAL PHASE ---");
-		System.out.println("SOLUTION: " + getTotalDistance(solution));
+		System.out.println("SOLUTION: " + getTotalDistance(points));
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.TRICKY_TRAPEZOID;
+		double[][] graph = Reference.SQUARE_WITH_CENTER;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -136,43 +136,21 @@ public class Main {
 		if (collisions.isEmpty()) {
 			printResults(graph, points);
 		} else {
-			List<Point> solution = new ArrayList<>();
-
-			// O(n^2)
-			for (int t = 0; t < points.size(); ++t) {
-				Point point = points.get(t);
-				solution.add(point);
-
-				for (int s = 0; s < t; ++s) { // first point will be ignored automatically
-					Point collision = collisions.get(s);
-
-					// add the collision if it is the closer neighbor, else leave it in the cache
-					if (collision.getY() == point.getY()) {
-						Point neighbor = points.get(t == points.size() - 1 ? 0 : t + 1);
-
-						if (point.getDistance(collision) <= point.getDistance(neighbor)) {
-							solution.add(collision);
-							collisions.remove(s);
-						}
-					}
-				}
-			}
-
 			List<Point> virtualSolution;
 
 			// final verification; check if collisions are in the right spot
 			if (collisions.isEmpty()) {
 
 				// O(n^2)
-				for (int t = 1; t < solution.size(); ++t) { // a collision cannot be the first point, so skip it
-					Point p = solution.get(t);
+				for (int t = 1; t < points.size(); ++t) { // a collision cannot be the first point, so skip it
+					Point p = points.get(t);
 
 					if (p.isColliding()) {
-						virtualSolution = new ArrayList<>(solution);
+						virtualSolution = new ArrayList<>(points);
 						Collections.swap(virtualSolution, t, t - 1);
 
-						if (getTotalDistance(virtualSolution) < getTotalDistance(solution)) {
-							solution = new ArrayList<>(virtualSolution);
+						if (getTotalDistance(virtualSolution) < getTotalDistance(points)) {
+							points = new ArrayList<>(virtualSolution);
 						}
 					}
 				}
@@ -184,18 +162,18 @@ public class Main {
 					Point c = collisions.remove(0);
 
 					// BUG TODO: Flat line misplaces the last collision
-					for (int t = 0; t < solution.size(); ++t) {
-						virtualSolution = new ArrayList<>(solution);
+					for (int t = 0; t < points.size(); ++t) {
+						virtualSolution = new ArrayList<>(points);
 						virtualSolution.add(t, c);
 						distances.put(getTotalDistance(virtualSolution), t);
 					}
 
-					solution.add(distances.get(Collections.min(distances.keySet())), c);
+					points.add(distances.get(Collections.min(distances.keySet())), c);
 					distances.clear();
 				}
 			}
 
-			printResults(graph, solution);
+			printResults(graph, points);
 		}
 	}
 }
