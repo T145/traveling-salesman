@@ -117,7 +117,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.SQUARE_WITH_CENTER;
+		double[][] graph = Reference.SIMPLE_GRAPH;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -125,34 +125,30 @@ public class Main {
 		}
 
 		List<Point> points = new ArrayList<>();
-
-		// O(n)
-		System.out.println("Input Graph: ");
-		for (int t = 0; t < graph.length; ++t) {
-			Point point = new Point(graph[t][0], graph[t][1]);
-			points.add(point);
-			System.out.println(point);
-		}
-
-		// O(nlog(n))
-		Collections.sort(points);
-
 		List<Collision> collisions = new ArrayList<>();
 
-		// O(n^2)
-		for (int t = 0; t < points.size(); ++t) {
-			Point point = points.get(t);
+		System.out.println("Input Graph: ");
+		for (int t = 0; t < graph.length; ++t) {
+			Point p = new Point(graph[t][0], graph[t][1]);
+			boolean isSource = true;
 
-			for (int s = t + 1; s < points.size(); ++s) {
-				Point other = points.get(s);
-
-				if (point.getY() == other.getY()) {
-					other.setColliding();
-					collisions.add(new Collision(point, other));
-					points.remove(s);
+			for (int s = 0; s < t; ++s) {
+				if (graph[t][1] == graph[s][1]) {
+					// then this point is a collision, and the location at s is the source
+					isSource = false;
+					p.setColliding();
+					collisions.add(new Collision(points.get(s), p));
 				}
 			}
+
+			if (isSource) {
+				points.add(p);
+			}
+
+			System.out.println(p);
 		}
+
+		Collections.sort(points);
 
 		if (collisions.isEmpty()) {
 			printResults(graph, points);

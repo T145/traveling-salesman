@@ -10,4 +10,5 @@ public class Reference {
 	public static final double[][] FLAT_LINE = { { 1, 1 }, { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 1 }, { 6, 1 }, { 7, 1 }, { 8, 1 } };
 	public static final double[][] SQUARE = { { 1, 1 }, { 5, 5 }, { 1, 5 }, { 5, 1 } };
 	public static final double[][] SQUARE_WITH_CENTER = { { 1, 1 }, { 5, 5 }, { 1, 5 }, { 5, 1 }, { 3, 3 } };
+	public static final double[][] OSCAR_DILEMA = { { 0, 0 }, { 1, 1000 }, { 2, 0 }, { 3, 1000 } };
 }
