@@ -29,7 +29,11 @@ public class Main {
 		}
 
 		public double getDistance(Point dest) {
-			return Math.sqrt(Math.pow(dest.getX() - x, 2) + Math.pow(dest.getY() - y, 2));
+			double distX = dest.getX() - x;
+			double distY = dest.getY() - y;
+			distX *= distX;
+			distY *= distY;
+			return Math.sqrt(distX + distY);
 		}
 
 		public void setColliding() {
