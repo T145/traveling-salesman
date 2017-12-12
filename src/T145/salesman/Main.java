@@ -1,12 +1,11 @@
 package T145.salesman;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 public class Main {
 
@@ -74,15 +73,15 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.SIMPLE_GRAPH;
+		double[][] graph = Reference.TRICKY_TRAPEZOID;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
 			return;
 		}
 
-		List<Point> points = new ArrayList<>();
-		Queue<Point> collisions = new LinkedList<>();
+		List<Point> points = new ArrayList<>(graph.length);
+		ArrayDeque<Point> collisions = new ArrayDeque<>(graph.length);
 
 		// O(n)
 		System.out.println("Input Graph: ");
@@ -111,7 +110,7 @@ public class Main {
 
 		if (!collisions.isEmpty()) {
 			List<Point> virtualSolution;
-			Map<Double, Integer> distances = new HashMap<>();
+			Map<Double, Integer> distances = new HashMap<>(points.size(), 1F);
 
 			// O(n^3)
 			while (!collisions.isEmpty()) {
