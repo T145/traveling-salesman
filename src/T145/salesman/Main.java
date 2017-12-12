@@ -73,21 +73,6 @@ public class Main {
 		return shortestDist;
 	}
 
-	private static void printResults(double[][] graph, List<Point> points) {
-		System.out.println('\n' + " --- RESULT ---");
-
-		for (Point point : points) {
-			System.out.println(point);
-		}
-
-		System.out.println('\n' + " --- VERIFICATION ---");
-		System.out.println("Graph Length:\t" + graph.length);
-		System.out.println("Solution Size:\t" + points.size());
-		System.out.println("VERIFIED: " + (points.size() == graph.length));
-		System.out.println('\n' + " --- FINAL PHASE ---");
-		System.out.println("SOLUTION: " + getTotalDistance(points));
-	}
-
 	public static void main(String[] args) {
 		double[][] graph = Reference.SIMPLE_GRAPH;
 
@@ -124,9 +109,7 @@ public class Main {
 			}
 		}
 
-		if (collisions.isEmpty()) {
-			printResults(graph, points);
-		} else {
+		if (!collisions.isEmpty()) {
 			List<Point> virtualSolution;
 			Map<Double, Integer> distances = new HashMap<>();
 
@@ -145,6 +128,17 @@ public class Main {
 			}
 		}
 
-		printResults(graph, points);
+		System.out.println('\n' + " --- RESULT ---");
+
+		for (Point point : points) {
+			System.out.println(point);
+		}
+
+		System.out.println('\n' + " --- VERIFICATION ---");
+		System.out.println("Graph Length:\t" + graph.length);
+		System.out.println("Solution Size:\t" + points.size());
+		System.out.println("VERIFIED: " + (points.size() == graph.length));
+		System.out.println('\n' + " --- FINAL PHASE ---");
+		System.out.println("SOLUTION: " + getTotalDistance(points));
 	}
 }
