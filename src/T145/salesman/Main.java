@@ -73,7 +73,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.TRICKY_TRAPEZOID;
+		double[][] graph = Reference.RHOMBUS;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -108,8 +108,20 @@ public class Main {
 			}
 		}
 
-		if (!collisions.isEmpty()) {
-			List<Point> virtualSolution;
+		List<Point> virtualSolution;
+
+		if (collisions.isEmpty()) {
+
+			// O(n^2)
+			for (int t = 1; t < points.size(); ++t) {
+				virtualSolution = new ArrayList<>(points);
+				Collections.swap(virtualSolution, t, t - 1);
+
+				if (getTotalDistance(virtualSolution) < getTotalDistance(points)) {
+					points = new ArrayList<>(virtualSolution);
+				}
+			}
+		} else {
 			Map<Double, Integer> distances = new HashMap<>(points.size(), 1F);
 
 			// O(n^3)
