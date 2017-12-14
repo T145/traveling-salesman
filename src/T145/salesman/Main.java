@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,14 +74,14 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.RHOMBUS;
+		double[][] graph = Reference.getRandomIntegerGraph(1000);
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
 			return;
 		}
 
-		List<Point> points = new ArrayList<>(graph.length);
+		LinkedList<Point> points = new LinkedList<>();
 		ArrayDeque<Point> collisions = new ArrayDeque<>(graph.length);
 
 		// O(n)
@@ -118,7 +119,7 @@ public class Main {
 				Collections.swap(virtualSolution, t, t - 1);
 
 				if (getTotalDistance(virtualSolution) < getTotalDistance(points)) {
-					points = new ArrayList<>(virtualSolution);
+					points = new LinkedList<>(virtualSolution);
 				}
 			}
 		} else {
