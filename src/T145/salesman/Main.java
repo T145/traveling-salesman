@@ -63,18 +63,23 @@ public class Main {
 		}
 	}
 
+	private static Point getNextPoint(List<Point> points, int start) {
+		return points.get(start == points.size() - 1 ? 0 : start + 1);
+	}
+
 	private static double getTotalDistance(List<Point> points) {
 		double shortestDist = 0;
 
 		for (int t = 0; t < points.size(); ++t) {
-			shortestDist += points.get(t).getDistance(points.get(t == points.size() - 1 ? 0 : t + 1));
+			shortestDist += points.get(t).getDistance(getNextPoint(points, t));
 		}
 
 		return shortestDist;
 	}
 
 	public static void main(String[] args) {
-		double[][] graph = Reference.getRandomIntegerGraph(1000);
+		long start = System.currentTimeMillis();
+		double[][] graph = Reference.getRandomIntegerGraph(100);
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -118,7 +123,15 @@ public class Main {
 				virtualSolution = new ArrayList<>(points);
 				Collections.swap(virtualSolution, t, t - 1);
 
-				if (getTotalDistance(virtualSolution) < getTotalDistance(points)) {
+				double solutionDist = 0;
+				double virtualDist = 0;
+
+				for (int s = 0; s < points.size(); ++s) {
+					solutionDist += points.get(s).getDistance(getNextPoint(points, s));
+					virtualDist += virtualSolution.get(s).getDistance(getNextPoint(virtualSolution, s));
+				}
+
+				if (virtualDist < solutionDist) {
 					points = new LinkedList<>(virtualSolution);
 				}
 			}
@@ -152,5 +165,9 @@ public class Main {
 		System.out.println("VERIFIED: " + (points.size() == graph.length));
 		System.out.println('\n' + " --- FINAL PHASE ---");
 		System.out.println("SOLUTION: " + getTotalDistance(points));
+
+		long end = System.currentTimeMillis();
+		long duration = end - start;
+		System.out.println("Runtime: " + duration + " ms");
 	}
 }
