@@ -100,6 +100,8 @@ public class Main {
 		// O(nlog(n))
 		Collections.sort(points);
 
+		List<Point> virtualSolution;
+
 		// O(n^2)
 		for (int t = 0; t < points.size(); ++t) {
 			Point point = points.get(t);
@@ -112,14 +114,8 @@ public class Main {
 					points.remove(s);
 				}
 			}
-		}
 
-		List<Point> virtualSolution;
-
-		if (collisions.isEmpty()) {
-
-			// O(n^2)
-			for (int t = 1; t < points.size(); ++t) {
+			if (t > 0) {
 				virtualSolution = new ArrayList<>(points);
 				Collections.swap(virtualSolution, t, t - 1);
 
@@ -135,7 +131,9 @@ public class Main {
 					points = new LinkedList<>(virtualSolution);
 				}
 			}
-		} else {
+		}
+
+		if (!collisions.isEmpty()) {
 			Map<Double, Integer> distances = new HashMap<>(points.size(), 1F);
 
 			// O(n^3)
