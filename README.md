@@ -25,7 +25,6 @@ The length of the overall path must be considered when choosing each subpath.
 This is done in the initialization phase of the algorithm.
 The pseudocode for the whole algorithm is as follows:
 
-    
     solution = new list
     collisions = new list
     
@@ -38,7 +37,6 @@ The pseudocode for the whole algorithm is as follows:
     // // if you think in terms of triangles this verifies if a point is close to its neighbor
     else
     // find the best spots to insert collisions
-    
 
 The only time we run into problems when using my method is if any point shares the same y-value with another point.
 
@@ -59,20 +57,7 @@ Every possible path would have to be either one or a mixture of these.
 
 ## Asymptotic Analysis
 
-_*Against Graph Without Collisions*_
-
-| Phase | Performance
---- | :---:
-Pre | O(n^2)
-Init | O(n^2)
-Post | theta(n)
-
-_*Against Graph With Collisions*_
-
-| Phase | Performance
---- | :---:
-Pre | O(n^2)
-Init | O(n^3)
-Post | theta(n)
+Worst case is a graph with collisions, yielding an overall worst time of O(n^3).
+If the graph contains no collisions, the worst case runtime is O(n^2).
 
 ### [Copyright](https://www.infoworld.com/article/2615869/open-source-software/github-needs-to-take-open-source-seriously.html)
