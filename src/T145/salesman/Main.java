@@ -79,7 +79,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
-		double[][] graph = Reference.getRandomIntegerGraph(100);
+		double[][] graph = Reference.GREYBEARD;
 
 		if (graph.length <= 1) {
 			System.out.println("SOLUTION: 0");
@@ -115,21 +115,19 @@ public class Main {
 				}
 			}
 
-			if (t > 0) {
-				virtualSolution = new ArrayList<>(points);
-				Collections.swap(virtualSolution, t, t - 1);
+			virtualSolution = new ArrayList<>(points);
+			Collections.swap(virtualSolution, t, t == 0 ? points.size() - 1 : t - 1);
 
-				double solutionDist = 0;
-				double virtualDist = 0;
+			double solutionDist = 0;
+			double virtualDist = 0;
 
-				for (int s = 0; s < points.size(); ++s) {
-					solutionDist += points.get(s).getDistance(getNextPoint(points, s));
-					virtualDist += virtualSolution.get(s).getDistance(getNextPoint(virtualSolution, s));
-				}
+			for (int s = 0; s < points.size(); ++s) {
+				solutionDist += points.get(s).getDistance(getNextPoint(points, s));
+				virtualDist += virtualSolution.get(s).getDistance(getNextPoint(virtualSolution, s));
+			}
 
-				if (virtualDist < solutionDist) {
-					points = new LinkedList<>(virtualSolution);
-				}
+			if (virtualDist < solutionDist) {
+				points = new LinkedList<>(virtualSolution);
 			}
 		}
 
@@ -163,9 +161,6 @@ public class Main {
 		System.out.println("VERIFIED: " + (points.size() == graph.length));
 		System.out.println('\n' + " --- FINAL PHASE ---");
 		System.out.println("SOLUTION: " + getTotalDistance(points));
-
-		long end = System.currentTimeMillis();
-		long duration = end - start;
-		System.out.println("Runtime: " + duration + " ms");
+		System.out.println("Runtime: " + (System.currentTimeMillis() - start) + " ms");
 	}
 }

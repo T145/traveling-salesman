@@ -20,29 +20,28 @@ The easiest way to make this understandable for a computer is to make the whole 
 
 Thinking abstractly, we take all of the points in the graph and arrange them into one straight line along the y-axis, creating a path with the shortest distance between each point.
 
-Now this would give us the shortest Hamiltonian, but we can't say that the shortest Hamiltonian always results in the shortest possible circuit.
+This would give us the shortest Hamiltonian, but we can't say that the shortest Hamiltonian always results in the shortest possible circuit.
 The length of the overall path must be considered when choosing each subpath.
-This is done in the initialization phase of the algorithm.
+
+Now the only time we run into problems when using my method is if any point shares the same y-value with another point.
+
+I call these points collisions. To find the best place to put them into the graph, all we have to do is test the distance at each point and choose which index gives us the shortest distance.
+
+This is the part of the algorithm that performs the worst, and has the most room for improvement.
+
 The pseudocode for the whole algorithm is as follows:
 
     solution = new list
     collisions = new list
     
     // init solution
-    // sort solution
-    // remove collisions
     
-    if we have no collisions
-    // verify the solution by swapping points and making sure we still have the shortest distance
-    // // if you think in terms of triangles this verifies if a point is close to its neighbor
-    else
-    // find the best spots to insert collisions
-
-The only time we run into problems when using my method is if any point shares the same y-value with another point.
-
-I call these points collisions. To find the best place to put them into the graph, all we have to do is test the distance at each point and choose which index gives us the shortest distance.
-
-This is the part of the algorithm that performs the worst, and has the most room for improvement.
+    // sort solution
+    
+    // be sure we have the shortest path, and remove any collisions for future calculation
+    
+    if we have collisions
+    // find the best places to put them
 
 ## Results
 
