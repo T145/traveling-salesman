@@ -31,17 +31,13 @@ This is the part of the algorithm that performs the worst, and has the most room
 
 The pseudocode for the whole algorithm is as follows:
 
-    solution = new list
-    collisions = new list
+    init solution
     
-    // init solution
+    sort solution
     
-    // sort solution
+    be sure we have the shortest path, and remove any collisions for future calculation
     
-    // be sure we have the shortest path, and remove any collisions for future calculation
-    
-    if we have collisions
-    // find the best places to put them
+    if we have collisions then find the best places to put them
 
 ## Results
 
@@ -57,6 +53,9 @@ Every possible path would have to be either one or a mixture of these.
 ## Asymptotic Analysis
 
 Worst case is a graph with collisions, yielding an overall worst time of O(n^3).
+
 If the graph contains no collisions, the worst case runtime is O(n^2).
+
+The future plan is to use some kind of tree to make collision calculation O(nlgn), which makes its best case O(n)
 
 ### [Copyright](https://www.infoworld.com/article/2615869/open-source-software/github-needs-to-take-open-source-seriously.html)
