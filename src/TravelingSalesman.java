@@ -27,39 +27,29 @@ public class TravelingSalesman {
 
         out.println("Welcome! Please select a graph to use:");
 
-        for (int t = 0; t < Graphs.values().length; ++t) {
-            out.println("(" + t + ") : " + Graphs.values()[t].name());
-        }
-
-        double[][] graph = Graphs.values()[in.nextInt()].getGraph();
-        long startTime = System.currentTimeMillis();
-
-        if (graph.length == 0) {
-            out.println("SOLUTION: 0");
-            return;
+        for (int t = 0; t < Graph.values().length; ++t) {
+            out.println("(" + t + ") : " + Graph.values()[t].name());
         }
 
         // O(n)
         // build the graph in terms of our point
-        List<Point> points = new ArrayList<>(graph.length);
+        List<Point> points = Graph.values()[in.nextInt()].getPoints();
+        int initialSize = points.size();
 
-        System.out.println("Input Graph: ");
-        for (double[] dot : graph) {
-            points.add(new Point(dot[1], dot[0]));
-            System.out.println("x: " + dot[0] + "; y: " + dot[1]);
+        // O(n)
+        // SWAP X & Y to properly sort the points
+        for (Point point : points) {
+            point.swapCoords();
         }
-
-        // NOTE: X & Y coords are swapped
 
         // O(nlgn)
         // sort the graph first to make finding duplicates easier
         Collections.sort(points);
 
-        // O(n)
-        // determine if the graph has any collisions
-        //List<Point> wreck = new ArrayList<>();
         ArrayDeque<Point> wreck = new ArrayDeque<>();
 
+        // O(n)
+        // determine if the graph has any collisions
         for (int t = 0; t < points.size(); ++t) {
             Point curr = points.get(t);
             Point next = getNextPoint(points, t);
@@ -89,10 +79,10 @@ public class TravelingSalesman {
             }
         }
 
-        // O(n)
-        // determine the shortest possible circuit
         List<Point> temp;
 
+        // O(n)
+        // determine the shortest possible circuit
         for (int t = 0; t < points.size(); ++t) {
             temp = new ArrayList<>(points);
             Point curr = points.get(t);
@@ -107,10 +97,11 @@ public class TravelingSalesman {
             }
         }
 
+        // O(n^3)
+        // fit in collisions if we have any
         if (!wreck.isEmpty()) {
             Map<Double, Integer> distances = new HashMap<>(points.size(), 1F);
 
-            // O(n^3)
             while (!wreck.isEmpty()) {
                 Point c = wreck.remove();
 
@@ -132,11 +123,11 @@ public class TravelingSalesman {
         }
 
         System.out.println('\n' + " --- VERIFICATION ---");
-        System.out.println("Graph Length:\t" + graph.length);
-        System.out.println("Solution Size:\t" + points.size());
-        System.out.println("VERIFIED: " + (points.size() == graph.length));
+        System.out.println("Initial Size:\t" + initialSize);
+        System.out.println("Final Size:\t" + points.size());
+        System.out.println("VERIFIED: " + (points.size() == initialSize));
+
         System.out.println('\n' + " --- FINAL PHASE ---");
         System.out.println("SOLUTION: " + getTotalDistance(points));
-        System.out.println("Runtime: " + (System.currentTimeMillis() - startTime) + " ms");
     }
 }
