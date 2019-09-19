@@ -67,5 +67,3 @@ Best case: Graph contains no collisions; worst case runtime is `O(nlgn)`, due to
 Langauge: Python
 
 Worst and Best cases: worst case runtime is `O(nlgn)` due to point sorting, overall algorithm performance is `O(n)`
-
-### [Copyright](https://www.infoworld.com/article/2615869/open-source-software/github-needs-to-take-open-source-seriously.html)
